@@ -1,7 +1,8 @@
-import { dbConnect } from "@/lib/dbConnect";
+import dbConnect from "@/lib/dbConnect";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -42,7 +43,6 @@ export async function POST(req) {
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
-
     if (!passwordMatch) {
       return new Response(JSON.stringify({ error: "Invalid credentials" }), {
         status: 401,
@@ -51,19 +51,28 @@ export async function POST(req) {
     }
 
     if (!process.env.JWT_SECRET) {
-      return new Response(JSON.stringify({ error: "Server misconfiguration" }), {
+      return new Response(JSON.stringify({ error: "JWT secret missing" }), {
         status: 500,
         headers,
       });
     }
 
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    return new Response(JSON.stringify({ message: "Login successful"}), {
+    // ✅ Set token in HTTP-only cookie
+    cookies().set("token", token, {
+      httpOnly: true,
+      path: "/",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24, // 1 day
+    });
+
+    return new Response(JSON.stringify({ message: "Login successful" }), {
       status: 200,
       headers,
     });

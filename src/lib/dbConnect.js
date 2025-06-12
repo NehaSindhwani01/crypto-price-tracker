@@ -1,23 +1,25 @@
-import mongoose from 'mongoose';
-import dotenv from "dotenv";
-dotenv.config();
+import mongoose from "mongoose";
+
+const MONGODB_URI = process.env.MONGO_DB_URL;
 
 let isConnected = false;
 
-export const dbConnect = async () => {
+async function dbConnect() {
   if (isConnected) return;
 
-  try {
+  if (!MONGODB_URI) throw new Error("MongoDB URI not defined");
 
-    await mongoose.connect(process.env.MONGO_DB_URL, {
-      dbName: "crypto-price-tracker",
+  try {
+    await mongoose.connect(MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-
     isConnected = true;
-    console.log("MongoDB connected");
+    console.log("✅ MongoDB connected");
   } catch (error) {
-    console.error("MongoDB connection failed", error);
+    console.error("MongoDB connection error:", error);
+    throw error;
   }
-};
+}
+
+export default dbConnect;

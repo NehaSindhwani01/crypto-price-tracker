@@ -1,4 +1,4 @@
-import { dbConnect } from "@/lib/dbConnect";
+import dbConnect from "@/lib/dbConnect";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
@@ -18,8 +18,21 @@ export async function OPTIONS() {
 export async function POST(req) {
   try {
     const { name, email, password } = await req.json();
+
+
+    // Validate input
+    if (!name || !email || !password || typeof password !== "string") {
+      return Response.json({ error: "Invalid input" }, {
+        status: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+    }
+
     await dbConnect();
 
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return Response.json({ error: "User already exists" }, {
@@ -30,8 +43,10 @@ export async function POST(req) {
       });
     }
 
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create and save new user
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
 

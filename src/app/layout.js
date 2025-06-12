@@ -16,12 +16,15 @@ export const metadata = {
   title: "Crypto Price Tracker",
   description: "Live cryptocurrency tracking app",
 };
-
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/footer";
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Navbar/>
         {children}
+        <Footer/>
       </body>
     </html>
   );
