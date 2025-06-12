@@ -2,16 +2,28 @@
 
 A web app that lets users sign up, log in, and soon view real-time cryptocurrency prices.
 
-## Features
-- ✅ User Signup & Login using MongoDB, bcrypt, and JWT
-- ✅ Tested using Hoppscotch
-- ⏳ Coming Soon: Dashboard with real-time crypto data
+## 🚀 Features
+
+- 🔍 Search for your favorite coins
+- 💰 View prices in multiple currencies (USD, INR, EUR, etc.)
+- 📈 Real-time market data with auto-refresh every 30 seconds
+- ⭐ Add/remove coins to your favorites
+- 📊 Mini sparklines and 7-day price charts
+- 🔐 Authentication with protected routes
+
+---
 
 ## Tech Stack
 - Next.js 14+
 - MongoDB + Mongoose
 - bcryptjs + JWT for auth
 - CSS Modules
+
+---
+
+## 🌐 API Used
+
+- [CoinGecko API](https://www.coingecko.com/en/api)
 
 ---
 
