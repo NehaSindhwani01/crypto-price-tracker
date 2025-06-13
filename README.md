@@ -45,4 +45,27 @@ Shows detailed statistics and chart for a specific coin.
 ---
 
 ## 📁 Folder Structure
+src/
+├── app/ # Next.js pages and routing
+│ └── api/ # API routes (login/signup)
+├── components/ # Reusable React components (e.g., CoinCard, Pagination)
+├── styles/ # Global styles
+└── utils/ # Helper functions
 
+---
+
+## ⚙️ Installation & Setup
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/NehaSindhwani01/crypto-price-tracker.git
+
+# 2. Navigate into the project
+cd crypto-price-tracker
+
+# 3. Install dependencies
+npm install
+
+# 4. Run the development server
+npm run dev
+The app will be available at http://localhost:3000
