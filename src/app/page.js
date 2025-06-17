@@ -20,6 +20,15 @@ ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip,
 const supportedCurrencies = ["usd", "inr", "eur", "gbp", "jpy"];
 const coinsPerPage = 20;
 
+// Map currency codes to their symbols
+const currencySymbols = {
+  USD: "$",
+  INR: "₹",
+  EUR: "€",
+  GBP: "£",
+  JPY: "¥",
+};
+
 const MiniSparkline = ({ data }) => {
   if (!data || data.length === 0) return null;
 
@@ -57,7 +66,6 @@ const MiniSparkline = ({ data }) => {
 };
 
 export default function Home() {
-  // All state hooks at the top
   const router = useRouter();
   const [coins, setCoins] = useState([]);
   const [currency, setCurrency] = useState("usd");
@@ -73,9 +81,8 @@ export default function Home() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [loginMessage, setLoginMessage] = useState("");
-  const [marketCapFilter, setMarketCapFilter] = useState("all"); // Added market cap filter state
+  const [marketCapFilter, setMarketCapFilter] = useState("all");
 
-  // All effects at the top
   useEffect(() => {
     const token = localStorage.getItem("token");
     setLoggedIn(!!token);
@@ -115,12 +122,12 @@ export default function Home() {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-        
-        const res = await fetch("/api/favorites", { 
+
+        const res = await fetch("/api/favorites", {
           credentials: "include",
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
         if (!res.ok) throw new Error();
         const json = await res.json();
@@ -132,7 +139,6 @@ export default function Home() {
     loadFavorites();
   }, [loggedIn]);
 
-  // Helper functions
   const toggleFavorite = async (coinId) => {
     if (!loggedIn) {
       setLoginMessage("Please login to add coins to your favorites");
@@ -144,9 +150,9 @@ export default function Home() {
       const token = localStorage.getItem("token");
       const res = await fetch("/api/favorites", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ coinId }),
       });
@@ -205,18 +211,16 @@ export default function Home() {
     alert(`Buy action triggered for ${coinId}`);
   };
 
-  // Filtering logic
   const filtered = coins
     .filter((c) => (!showFavoritesOnly || favoriteIds.includes(c.id)))
     .filter((c) => c.name.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) => b.market_cap - a.market_cap) // Always sort by market cap first
+    .sort((a, b) => b.market_cap - a.market_cap)
     .filter((c, index) => {
       if (marketCapFilter === "top10") return index < 10;
       if (marketCapFilter === "top100") return index < 100;
-      return true; // "all" shows everything
+      return true;
     });
 
-  // Conditional rendering moved to the end
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-950">
@@ -243,7 +247,6 @@ export default function Home() {
     );
   }
 
-  // Main return
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6">
       <h1 className="text-4xl font-bold text-center mb-8 text-cyan-500">Crypto Market</h1>
@@ -307,7 +310,9 @@ export default function Home() {
             <tr>
               <th className="px-3 py-3 w-10 text-center">#</th>
               <th className="px-3 py-3 w-52 text-left">Coin</th>
-              <th className="px-3 py-3 w-36 text-right">Price ({currency.toUpperCase()})</th>
+              <th className="px-3 py-3 w-36 text-right">
+                Price ({currency.toUpperCase()})
+              </th>
               <th className="px-3 py-3 w-24 text-right">24H</th>
               <th className="px-3 py-3 w-44 text-right">Market Cap</th>
               <th className="px-3 py-3 w-32 text-center">7D</th>
@@ -316,8 +321,8 @@ export default function Home() {
           </thead>
           <tbody>
             {filtered.map((c, idx) => (
-              <tr 
-                key={c.id} 
+              <tr
+                key={c.id}
                 className="hover:bg-gray-700 transition-all duration-150 text-sm cursor-pointer group"
                 onClick={() => router.push(`/coin/${c.id}`)}
               >
@@ -325,8 +330,8 @@ export default function Home() {
                   {(page - 1) * coinsPerPage + idx + 1}
                 </td>
                 <td className="flex items-center gap-3 py-4 px-2 w-52 group-hover:bg-gray-700">
-                  <Link 
-                    href={`/coin/${c.id}`} 
+                  <Link
+                    href={`/coin/${c.id}`}
                     className="flex items-center gap-3 w-full"
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -338,20 +343,24 @@ export default function Home() {
                   </Link>
                 </td>
                 <td className="text-right py-4 px-2 w-36 group-hover:bg-gray-700">
-                  ${c.current_price.toLocaleString()}
+                  {currencySymbols[currency]}
+                  {c.current_price.toLocaleString()}
                 </td>
-                <td className={`text-right py-4 px-2 w-24 font-semibold group-hover:bg-gray-700 ${
-                  c.price_change_percentage_24h >= 0 ? "text-green-400" : "text-red-400"
-                }`}>
+                <td
+                  className={`text-right py-4 px-2 w-24 font-semibold group-hover:bg-gray-700 ${
+                    c.price_change_percentage_24h >= 0 ? "text-green-400" : "text-red-400"
+                  }`}
+                >
                   {c.price_change_percentage_24h?.toFixed(2)}%
                 </td>
                 <td className="text-right py-4 px-2 w-44 group-hover:bg-gray-700">
-                  ${c.market_cap.toLocaleString()}
+                  {currencySymbols[currency]}
+                  {c.market_cap.toLocaleString()}
                 </td>
                 <td className="text-center py-4 px-2 w-32 group-hover:bg-gray-700">
                   <MiniSparkline data={c.sparkline_in_7d?.price} />
                 </td>
-                <td 
+                <td
                   className="text-center py-4 px-2 w-36 space-x-2 group-hover:bg-gray-700"
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -361,7 +370,6 @@ export default function Home() {
                       toggleFavorite(c.id);
                     }}
                     className="text-yellow-400 text-xl hover:scale-110 transition-transform"
-                    title={loggedIn ? "" : "Login to add favorites"}
                   >
                     {favoriteIds.includes(c.id) ? "★" : "☆"}
                   </button>
@@ -431,7 +439,7 @@ export default function Home() {
       )}
 
       {showLoginPrompt && (
-        <LoginPrompt 
+        <LoginPrompt
           message={loginMessage}
           onClose={() => setShowLoginPrompt(false)}
         />
